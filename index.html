@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <link rel="stylesheet" href="assets/css/index.css">
+
+</head>
+<body>
+
+<div class="TableView">
+    <table>
+        <thead>
+        <tr>
+            <td>User-ID</td>
+            <td>Chat-Nachricht</td>
+        </tr>
+        </thead>
+        <tbody class="ChatMessages"></tbody>
+        <tbody>
+        <tr>
+            <td colspan="2">
+                <input type="text" id="sendMessageText">
+                <input type="submit" id="sendMessageButton" value="Nachricht senden">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    jQuery(document).ready(() => {
+
+        var socketConnection = new WebSocket('ws://localhost:8080');
+        socketConnection.onopen = function(e) {
+            console.log("Verbindung hergestellt");
+        };
+
+        socketConnection.onclose = function(e) {
+            console.log("Verbindung wurde geschlossen!");
+        }
+
+        socketConnection.onmessage = function(e) {
+            console.log(e.data);
+            var data = JSON.parse(e.data);
+            jQuery(".ChatMessages").append('<tr><td>'+data.userId+'</td><td>'+data.messageText+'</td></tr>');
+
+        };
+
+        // Close Connection (When Leave)
+        //socketConnection.close();
+
+        var items = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+        var userId = items[Math.floor(Math.random()*items.length)];
+
+        jQuery("#sendMessageButton").on("click", () => {
+            var MessageHolder = jQuery("#sendMessageText");
+
+            var messageText = MessageHolder.val();
+
+            if(!messageText){
+                alert("Gebe eine Nachricht ein!");
+                return false;
+            }
+
+            var messageObject = {
+                userId: userId,
+                messageText: messageText
+            };
+
+            socketConnection.send(JSON.stringify(messageObject));
+            MessageHolder.val("");
+        });
+
+    });
+</script>
+
+</body>
+</html>

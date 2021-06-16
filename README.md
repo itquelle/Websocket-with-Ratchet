@@ -1,2 +1,3 @@
-# Websocket with Ratchet
- Websocket with Ratchet
+# Start Server
+var/www/../bin/php server.php
+
